@@ -4,12 +4,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Câmera</title>
+    <style>
+        #sendButton {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        #sendButton:hover {
+            background-color: #45a049;
+        }
+        #video {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
 </head>
 <body>
     <video id="video" autoplay></video>
     <div id="fotos"></div>
+    <button id="sendButton" style="display:none;">Enviar para Pexels</button>
 
     <script>
+        let imagemCapturada = null; // Variável para armazenar a imagem capturada
+
         async function iniciarCamera() {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ video: true });
@@ -34,6 +54,42 @@
                 img.style.width = "100px"; // Ajusta o tamanho da imagem
                 img.style.margin = "5px";
                 document.getElementById('fotos').prepend(img);
+
+                // Armazena a imagem capturada para enviar
+                imagemCapturada = canvas.toDataURL('image/png');
+                document.getElementById('sendButton').style.display = 'inline-block'; // Exibe o botão de enviar
+            }
+        }
+
+        document.getElementById('sendButton').addEventListener('click', function() {
+            if (imagemCapturada) {
+                enviarParaPexels(imagemCapturada);
+            }
+        });
+
+        async function enviarParaPexels(imageData) {
+            try {
+                // Aqui você pode simular o envio para o Pexels ou enviar a imagem para outro serviço
+                console.log('Enviando imagem para o Pexels ou outro serviço...');
+
+                // Exemplo de envio para um endpoint fictício:
+                const response = await fetch('https://api.pexels.com/v1/upload', {
+                    method: 'POST',
+                    headers: {
+                        Authorization: 'EnjBaoEg0jcpLsqvV98mXkFJpJPtccYrcdRNp4rhaNp3Rynmup5YMRbB', // Sua chave API
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        image: imageData
+                    })
+                });
+
+                const data = await response.json();
+                console.log('Resposta do Pexels:', data);
+                alert('Imagem enviada com sucesso!');
+            } catch (error) {
+                console.error('Erro ao enviar a imagem:', error);
+                alert('Erro ao enviar a imagem');
             }
         }
 
